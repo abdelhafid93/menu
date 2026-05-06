@@ -9,7 +9,7 @@ function HeroSection({ data }) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 pt-5 md:pt-28">
         {data?.map((item, index) => (
           <Link href={`/${item.slug}`} key={item?._id}>
-            <div className="relative group cursor-pointer overflow-hidden rounded-2xl border-3 border-red-700 shadow-lg">
+            <div className="relative group cursor-pointer overflow-hidden rounded-2xl border border-yellow-700 shadow-lg">
               {/* عرض الصورة مع تحسينات الأداء */}
               <div className="h-48 w-full relative ">
                 <Image
