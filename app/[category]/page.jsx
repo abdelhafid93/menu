@@ -47,10 +47,10 @@ async function PageHome({ params }) {
       <div className="relative z-10 container mx-auto px-4 py-8 md:py-12">
         <div className="flex justify-between  ">
         {/* return Home  */}
-        <Link href={"/"} className="inline-flex items-center gap-1 border-b border-white/20 hover:border-yellow-500 transition-colors mb-6 group">
+        <Link href={"/#menu"} className="inline-flex items-center gap-1 border-b border-white/20 hover:border-yellow-500 transition-colors mb-6 group">
           <LuArrowLeft className="text-white group-hover:text-yellow-500 transition-colors" />
           <span className="font-bold text-sm text-white group-hover:text-yellow-500 transition-colors pr-2">
-            Accueil
+            Retour
           </span>
         </Link>
        {/* ## icon shop */}
