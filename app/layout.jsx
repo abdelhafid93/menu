@@ -33,6 +33,7 @@ export default function RootLayout({ children }) {
        
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-950`}
       >
+        
         <ChatBot/>
         {children}
       </body>

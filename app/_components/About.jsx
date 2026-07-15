@@ -10,7 +10,7 @@ export default function AboutSection() {
 
         {/* Images */}
         <div className="relative">
-          <div className="relative h-[500px] rounded-3xl overflow-hidden">
+          <div className="relative h-[500px] rounded-3xl overflow-hidden mx-3">
             <Image
               src="/about-2.jpg"
               alt="Restaurant"
