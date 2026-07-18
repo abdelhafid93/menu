@@ -1,6 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "./_components/(headers)/Navbar";
 import ChatBot from "./_components/ChatBoot";
 
 const geistSans = Geist({
@@ -27,11 +26,12 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     // أضفنا suppressHydrationWarning لتجنب أخطاء التباين بين السيرفر والمتصفح
-    <html lang="en" suppressHydrationWarning >
+    <html lang="en" suppressHydrationWarning
+    className="scroll-smooth" >
       
       <body
        
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-950`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-950 `}
       >
         
         <ChatBot/>

@@ -1,26 +1,33 @@
-"use client";
-
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Hero() {
   return (
-    <section
-      className="relative min-h-screen mt-17 flex items-center justify-center bg-cover bg-center  "
-      style={{
-        backgroundImage: "url('/hero.jpg')",
-      }}
-    >
+    <section className="relative mt-17 min-h-screen flex items-center justify-center overflow-hidden">
+
+      {/* Background Image */}
+      <Image
+        src="/hero.jpg"
+        alt="Restaurant"
+        fill
+        priority
+        quality={100}
+        sizes="100vw"
+        className="object-cover"
+      />
+
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/60" />
 
       {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center text-white">
-     
 
         <h1 className="mt-6 text-5xl font-bold leading-tight md:text-7xl">
           Savourez une cuisine
           <br />
-          <span className="text-amber-400">authentique et raffinée</span>
+          <span className="text-amber-400">
+            authentique et raffinée
+          </span>
         </h1>
 
         <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-200 md:text-xl">
@@ -45,6 +52,7 @@ export default function Hero() {
             Réserver sur WhatsApp
           </a>
         </div>
+
       </div>
     </section>
   );
