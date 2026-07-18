@@ -143,10 +143,6 @@ export default function Footer() {
             © {new Date().getFullYear()} Bella Vista. Tous droits réservés.
           </p>
 
-          <p className="mt-4 md:mt-0">
-            Designed with ❤️ using Next.js
-          </p>
-
         </div>
 
       </div>
