@@ -55,8 +55,8 @@ async function PageHome({ params }) {
         </Link>
        {/* ## icon shop */}
 <div className="relative inline-flex  items-center justify-center">
-    <FaShoppingBag className="text-red-600 text-2xl md:text-3xl" />
-    <CartLength  /> 
+    {/* <FaShoppingBag className="text-red-600 text-2xl md:text-3xl" /> */}
+    {/* <CartLength  />  */}
 </div>
       </div>
         {/* Title */}
@@ -87,7 +87,7 @@ async function PageHome({ params }) {
                     className="rounded-full object-cover border-2 border-yellow-600/20 group-hover:border-yellow-500 transition-all duration-300 shadow-xl"
                   />
                   {/* ## icon add */}
-                  <HokAddCart item={item}/>
+                  {/* <HokAddCart item={item}/> */}
                 </div>
 
                 <div>

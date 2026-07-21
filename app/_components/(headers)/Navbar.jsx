@@ -3,14 +3,20 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
+import {
+  FaFacebookF,
+  FaInstagram,
+  FaWhatsapp,
+
+} from "react-icons/fa";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   const links = [
     { name: "Menu", href: "#menu" },
-    { name: "About", href: "#about" },
-    { name: "Gallery", href: "#gallery" },
+    { name: "À propos", href: "#about" },
+    { name: "Galerie", href: "#gallery" },
     { name: "Contact", href: "#contact" },
   ];
 
@@ -107,16 +113,28 @@ export default function Navbar() {
             ))}
           </div>
 
-          <div className="pb-6">
-            <a
-              href="https://wa.me/212600000000"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => setOpen(false)}
-              className="flex w-full items-center justify-center rounded-full bg-amber-500 py-3.5 text-center font-semibold text-black hover:bg-amber-400 transition duration-300 active:scale-95 shadow-lg shadow-amber-500/10"
-            >
-              Réserver une table
-            </a>
+          <div className="flex items-center justify-around gap-3.5 pb-16">
+               <a
+                             href="#"
+                             className="w-11 h-11 rounded-full border border-amber-500/30 flex items-center justify-center text-white hover:bg-amber-500 hover:text-black transition"
+                           >
+                             <FaFacebookF />
+                           </a>
+             
+                           <a
+                             href="#"
+                             className="w-11 h-11 rounded-full border border-amber-500/30 flex items-center justify-center text-white hover:bg-amber-500 hover:text-black transition"
+                           >
+                             <FaInstagram />
+                           </a>
+             
+                           <a
+                             href="https://wa.me/212600000000"
+                             target="_blank"
+                             className="w-11 h-11 rounded-full border border-amber-500/30 flex items-center justify-center text-white hover:bg-amber-500 hover:text-black transition"
+                           >
+                             <FaWhatsapp />
+                           </a>
           </div>
         </nav>
       </aside>
