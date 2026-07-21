@@ -3,12 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
-import {
-  FaFacebookF,
-  FaInstagram,
-  FaWhatsapp,
-
-} from "react-icons/fa";
+import { FaFacebookF, FaInstagram, FaWhatsapp } from "react-icons/fa";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -25,7 +20,6 @@ export default function Navbar() {
       {/* Navbar Container */}
       <header className="fixed top-0 left-0 w-full z-50 bg-[#111111]/90 backdrop-blur-xl border-b border-amber-500/20">
         <div className="max-w-7xl mx-auto h-20 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-
           {/* Logo */}
           <Link
             href="/"
@@ -66,7 +60,6 @@ export default function Navbar() {
           >
             <Menu size={28} />
           </button>
-
         </div>
       </header>
 
@@ -111,30 +104,29 @@ export default function Navbar() {
                 {link.name}
               </a>
             ))}
-          </div>
+            <div className="flex items-center justify-around gap-3.5 py-16">
+              <a
+                href="#"
+                className="w-11 h-11 rounded-full border border-amber-500/30 flex items-center justify-center text-white hover:bg-amber-500 hover:text-black transition"
+              >
+                <FaFacebookF />
+              </a>
 
-          <div className="flex items-center justify-around gap-3.5 pb-16">
-               <a
-                             href="#"
-                             className="w-11 h-11 rounded-full border border-amber-500/30 flex items-center justify-center text-white hover:bg-amber-500 hover:text-black transition"
-                           >
-                             <FaFacebookF />
-                           </a>
-             
-                           <a
-                             href="#"
-                             className="w-11 h-11 rounded-full border border-amber-500/30 flex items-center justify-center text-white hover:bg-amber-500 hover:text-black transition"
-                           >
-                             <FaInstagram />
-                           </a>
-             
-                           <a
-                             href="https://wa.me/212600000000"
-                             target="_blank"
-                             className="w-11 h-11 rounded-full border border-amber-500/30 flex items-center justify-center text-white hover:bg-amber-500 hover:text-black transition"
-                           >
-                             <FaWhatsapp />
-                           </a>
+              <a
+                href="#"
+                className="w-11 h-11 rounded-full border border-amber-500/30 flex items-center justify-center text-white hover:bg-amber-500 hover:text-black transition"
+              >
+                <FaInstagram />
+              </a>
+
+              <a
+                href="https://wa.me/212600000000"
+                target="_blank"
+                className="w-11 h-11 rounded-full border border-amber-500/30 flex items-center justify-center text-white hover:bg-amber-500 hover:text-black transition"
+              >
+                <FaWhatsapp />
+              </a>
+            </div>
           </div>
         </nav>
       </aside>
