@@ -1,6 +1,7 @@
-import menuHome from "./menuHome"
-import articles from "./articles"
-import categoryes from "./categoryes"
+import articles from "./articles";
+import categoryes from "./categoryes";
+import menuHome from "./menuHome";
+
 export const schema = {
-  types: [menuHome,articles,categoryes],
+  types: [menuHome,categoryes,articles],
 }

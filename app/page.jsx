@@ -7,7 +7,7 @@ import Gallery from "./_components/Gallery";
 import { client } from "@/sanity/lib/client";
 import HeroSection from "./_components/(headers)/HeroSection";
 import Footer from "./_components/Footer";
-import ChatBot from "./_components/ChatBoot";
+import WhatsAppButton from "./_components/Whats";
 
 
 const getData = async () => {
@@ -29,7 +29,7 @@ export default async function Home() {
   
   return (
     <main >
-      <ChatBot/>
+      <WhatsAppButton/>
         <Navbar/>
         <Hero/>
       <HeroSection data={data} />

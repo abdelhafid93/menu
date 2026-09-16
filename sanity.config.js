@@ -1,64 +1,28 @@
 'use client'
 
+/**
+ * This configuration is used to for the Sanity Studio that’s mounted on the `\app\studio\[[...tool]]\page.jsx` route
+ */
+
 import {visionTool} from '@sanity/vision'
-import {defineConfig, buildLegacyTheme} from 'sanity'
+import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
+
+// Go to https://www.sanity.io/docs/api-versioning to learn how API versioning works
 import {apiVersion, dataset, projectId} from './sanity/env'
 import {schema} from './sanity/schemaTypes'
 import {structure} from './sanity/structure'
-
-const props = {
-  '--my-black': '#111827', 
-  '--my-white': '#fff',
-  '--my-gold': '#EAB308',
-}
-
-export const myTheme = buildLegacyTheme({
-  '--black': props['--my-black'],
-  '--white': props['--my-white'],
-  '--component-bg': props['--my-black'],
-  '--component-text-color': props['--my-white'],
-  '--default-button-primary-color': props['--my-gold'],
-})
 
 export default defineConfig({
   basePath: '/studio',
   projectId,
   dataset,
-  theme: myTheme, 
+  // Add and edit the content schema in the './sanity/schemaTypes' folder
   schema,
   plugins: [
     structureTool({structure}),
+    // Vision is for querying with GROQ from inside the Studio
+    // https://www.sanity.io/docs/the-vision-plugin
     visionTool({defaultApiVersion: apiVersion}),
   ],
-  // --- الحل السحري لإخفاء زر Manage وروابط سانيتي الخارجية ---
-  studio: {
-    components: {
-       navbar: () => null, 
-      layout: (props) => (
-        <>
-          <style>{`
-            /* إخفاء زر Manage Project تماماً */
-            [data-testid="package-status-manage-button"],
-            [data-testid="context-menu-manage-project"],
-            a[href*="sanity.io/manage"] {
-              display: none !important;
-            }
-
-            /* إخفاء شعار سانيتي والقوائم التي تفتح روابط خارجية */
-            [data-testid="navbar-help-menu"],
-            [data-testid="action-menu-button"] {
-              display: none !important;
-            }
-              
-            /* تنظيف الشريط العلوي ليبقى فقط اسم العميل دون إضافات */
-            [data-testid="navbar-search"] {
-              display: none !important;
-            }
-          `}</style>
-          {props.renderDefault(props)}
-        </>
-      ),
-    },
-  },
 })
