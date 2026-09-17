@@ -18,7 +18,7 @@ export async function GET() {
         name,
         price,
         "imageUrl": image.asset->url,
-        "categoryName": categoryes->name
+        "categoryName": menuHome->name
       }`
     )
 
