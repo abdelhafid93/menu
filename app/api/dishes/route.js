@@ -2,6 +2,9 @@ import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import { writeClient } from "@/sanity/writeClient"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export async function GET() {
   // التحقق من الجلسة قبل إعطاء البيانات
   const cookieStore = await cookies()
@@ -18,19 +21,19 @@ export async function GET() {
         name,
         price,
         "imageUrl": image.asset->url,
-        "categoryName": menuHome->name
+        "categoryName": categoryes->name
       }`
     )
 
     // نجيبو التصنيفات أيضاً باش نستعملهم فقائمة (dropdown) إضافة طبق جديد
-const categories = await writeClient.fetch(
-  `*[_type == "menuHome"] | order(name asc) {
-    _id,
-    name,
-    order,
-    "imageUrl": image.asset->url
-  }`
-)
+    const categories = await writeClient.fetch(
+      `*[_type == "menuHome"] | order(order asc, name asc) {
+        _id,
+        name,
+        order,
+        "imageUrl": image.asset->url
+      }`
+    )
 
     return NextResponse.json({ dishes, categories })
   } catch (err) {
@@ -47,15 +50,23 @@ export async function PATCH(request) {
   }
 
   try {
-    const { id, name, price } = await request.json()
+    const { id, name, price, imageAssetId } = await request.json()
 
     if (!id) {
       return NextResponse.json({ error: "معرف الطبق ناقص" }, { status: 400 })
     }
 
+    const updates = { name, price }
+    if (imageAssetId) {
+      updates.image = {
+        _type: "image",
+        asset: { _type: "reference", _ref: imageAssetId },
+      }
+    }
+
     const updatedDoc = await writeClient
       .patch(id) // id هو الـ _id ديال الوثيقة فـ Sanity
-      .set({ name, price })
+      .set(updates)
       .commit()
 
     return NextResponse.json({ success: true, doc: updatedDoc })
@@ -96,12 +107,7 @@ export async function POST(request) {
   }
 
   try {
-    const {
-      name,
-      price,
-      categoryId,
-      imageAssetId,
-    } = await request.json()
+    const { name, price, categoryId, imageAssetId } = await request.json()
 
     if (!name || !categoryId) {
       return NextResponse.json(
@@ -110,11 +116,10 @@ export async function POST(request) {
       )
     }
 
-    const newDoc = await writeClient.create({
+    const doc = {
       _type: "article",
       name,
       price: Number(price) || 0,
-
       slug: {
         _type: "slug",
         current: name
@@ -123,38 +128,24 @@ export async function POST(request) {
           .replace(/\s+/g, "-")
           .replace(/[^\w-]+/g, ""),
       },
-
       categoryes: {
         _type: "reference",
         _ref: categoryId,
       },
-
-      ...(imageAssetId && {
-        image: {
-          _type: "image",
-          asset: {
-            _type: "reference",
-            _ref: imageAssetId,
-          },
-        },
-      }),
-
       isBestSeller: false,
-    })
+    }
 
-    return NextResponse.json({
-      success: true,
-      doc: newDoc,
-    })
+    if (imageAssetId) {
+      doc.image = {
+        _type: "image",
+        asset: { _type: "reference", _ref: imageAssetId },
+      }
+    }
+
+    const newDoc = await writeClient.create(doc)
+
+    return NextResponse.json({ success: true, doc: newDoc })
   } catch (err) {
-    console.error("CREATE DISH ERROR:", err)
-
-    return NextResponse.json(
-      {
-        error: "خطأ فالإضافة",
-        details: err.message,
-      },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "خطأ فالإضافة" }, { status: 500 })
   }
 }
