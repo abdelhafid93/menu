@@ -8,6 +8,7 @@ export default function Dashboard() {
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
   const [tab, setTab] = useState("dishes") // "dishes" | "categories"
 
   // --- تعديل طبق ---
@@ -43,10 +44,16 @@ export default function Dashboard() {
     loadDishes()
   }, [])
 
+  // تظهر رسالة النجاح لمدة 3 ثوانٍ ثم تختفي تلقائياً
+  function showSuccess(message) {
+    setSuccess(message)
+    setTimeout(() => setSuccess(""), 3000)
+  }
+
   async function loadDishes() {
     setLoading(true)
     try {
-      const res = await fetch("/api/dishes")
+      const res = await fetch("/api/dishes", { cache: "no-store" })
       if (res.status === 401) {
         window.location.href = "/admin"
         return
@@ -55,7 +62,7 @@ export default function Dashboard() {
       setDishes(data.dishes || [])
       setCategories(data.categories || [])
     } catch (err) {
-      setError("خطأ فتحميل البيانات")
+      setError("خطأ في تحميل البيانات")
     } finally {
       setLoading(false)
     }
@@ -110,15 +117,16 @@ export default function Dashboard() {
 
       await loadDishes()
       setEditingId(null)
+      showSuccess("تم التعديل بنجاح ✓")
     } catch (err) {
-      setError("ماقدرش يحفظ، حاول مرة أخرى")
+      setError("تعذر الحفظ، يرجى المحاولة مرة أخرى")
     } finally {
       setSaving(false)
     }
   }
 
   async function handleDelete(id) {
-    const confirmed = window.confirm("واش متأكد بغيتي تحذف هاد الطبق؟")
+    const confirmed = window.confirm("هل أنت تأكد من أنك تريد حذف هذا الطبق؟")
     if (!confirmed) return
 
     setDeletingId(id)
@@ -131,8 +139,9 @@ export default function Dashboard() {
       })
       if (!res.ok) throw new Error()
       setDishes((prev) => prev.filter((d) => d._id !== id))
+      showSuccess("تم الحذف بنجاح ✓")
     } catch (err) {
-      setError("ماقدرش يحذف، حاول مرة أخرى")
+      setError("تعذر الحذف، يرجى المحاولة مرة أخرى")
     } finally {
       setDeletingId(null)
     }
@@ -141,7 +150,7 @@ export default function Dashboard() {
   async function handleAddDish(e) {
     e.preventDefault()
     if (!newDish.name || !newDish.categoryId) {
-      setError("خاصك تعطي الاسم والتصنيف على الأقل")
+      setError("يرجى إدخال الاسم والتصنيف على الأقل")
       return
     }
 
@@ -165,8 +174,9 @@ export default function Dashboard() {
       setNewDish({ name: "", price: "", categoryId: "" })
       setNewDishImage(null)
       setShowAddForm(false)
+      showSuccess("تم إضافة الطبق بنجاح ✓")
     } catch (err) {
-      setError("ماقدرش يضيف الطبق، حاول مرة أخرى")
+      setError("تعذر إضافة الطبق، يرجى المحاولة مرة أخرى")
     } finally {
       setAdding(false)
     }
@@ -175,7 +185,7 @@ export default function Dashboard() {
   async function handleAddCategory(e) {
     e.preventDefault()
     if (!newCategory.name) {
-      setError("خاصك تعطي اسم التصنيف")
+      setError("يرجى إدخال اسم التصنيف")
       return
     }
 
@@ -199,8 +209,9 @@ export default function Dashboard() {
       setNewCategory({ name: "", order: "" })
       setNewCategoryImage(null)
       setShowAddCategory(false)
+      showSuccess("تم إضافة التصنيف بنجاح ✓")
     } catch (err) {
-      setError("ماقدرش يضيف التصنيف، حاول مرة أخرى")
+      setError("تعذر إضافة التصنيف، يرجى المحاولة مرة أخرى")
     } finally {
       setAddingCategory(false)
     }
@@ -208,7 +219,7 @@ export default function Dashboard() {
 
   async function handleDeleteCategory(id) {
     const confirmed = window.confirm(
-      "واش متأكد؟ إلا كاين أطباق مربوطة بهاد التصنيف، الحذف غادي يفشل."
+      "هل أنت تأكد؟ إذا كانت هناك أطباق مرتبطة بهذا التصنيف، سيفشل الحذف."
     )
     if (!confirmed) return
 
@@ -225,8 +236,9 @@ export default function Dashboard() {
         throw new Error(data.error)
       }
       setCategories((prev) => prev.filter((c) => c._id !== id))
+      showSuccess("تم حذف التصنيف بنجاح ✓")
     } catch (err) {
-      setError(err.message || "ماقدرش يحذف التصنيف")
+      setError(err.message || "تعذر حذف التصنيف")
     } finally {
       setDeletingCategoryId(null)
     }
@@ -269,8 +281,9 @@ export default function Dashboard() {
 
       await loadDishes()
       setEditingCategoryId(null)
+      showSuccess("تم تعديل التصنيف بنجاح ✓")
     } catch (err) {
-      setError("ماقدرش يحفظ التصنيف، حاول مرة أخرى")
+      setError("تعذر حفظ التصنيف، يرجى المحاولة مرة أخرى")
     } finally {
       setSavingCategory(false)
     }
@@ -315,6 +328,11 @@ export default function Dashboard() {
         </div>
 
         {error && <p className="text-red-400 text-center mb-4">{error}</p>}
+        {success && (
+          <p className="text-green-400 text-center mb-4 bg-green-500/10 border border-green-500/30 rounded-full py-2 px-4">
+            {success}
+          </p>
+        )}
 
         {tab === "dishes" && (
           <>
@@ -450,7 +468,7 @@ export default function Dashboard() {
                       </p>
                     )}
 
-                    <div className="flex gap-2 flex-shrink-0">
+                    <div className="flex flex-col sm:flex-row gap-2 flex-shrink-0">
                       {editingId === dish._id ? (
                         <>
                           <button
@@ -471,14 +489,14 @@ export default function Dashboard() {
                         <>
                           <button
                             onClick={() => startEdit(dish)}
-                            className="rounded-full border border-amber-500/30 px-4 py-2 text-sm text-amber-400 hover:bg-amber-500 hover:text-black transition"
+                            className="rounded-full border border-amber-500/30 px-4 py-2 text-sm text-amber-400 hover:bg-amber-500 hover:text-black transition text-center"
                           >
-                            عدّل
+                            تعديل
                           </button>
                           <button
                             onClick={() => handleDelete(dish._id)}
                             disabled={deletingId === dish._id}
-                            className="rounded-full border border-red-500/30 px-4 py-2 text-sm text-red-400 hover:bg-red-500 hover:text-white transition disabled:opacity-50"
+                            className="rounded-full border border-red-500/30 px-4 py-2 text-sm text-red-400 hover:bg-red-500 hover:text-white transition disabled:opacity-50 text-center"
                           >
                             {deletingId === dish._id ? "..." : "حذف"}
                           </button>
@@ -490,7 +508,7 @@ export default function Dashboard() {
                   {editingId === dish._id && (
                     <div className="mt-3">
                       <label className="block text-gray-400 text-sm mb-1">
-                        تبديل صورة الطبق (اختياري)
+                        تغيير صورة الطبق (اختياري)
                       </label>
                       <input
                         type="file"
@@ -505,7 +523,7 @@ export default function Dashboard() {
             </div>
 
             {dishes.length === 0 && (
-              <p className="text-gray-400 text-center">ماكاينش أطباق بعد</p>
+              <p className="text-gray-400 text-center">لا توجد أطباق حالياً</p>
             )}
           </>
         )}
@@ -614,12 +632,12 @@ export default function Dashboard() {
                       <div className="flex-1">
                         <p className="text-white font-semibold">{cat.name}</p>
                         <p className="text-gray-400 text-sm">
-                          ترتيب: {cat.order ?? "-"}
+                          الترتيب: {cat.order ?? "-"}
                         </p>
                       </div>
                     )}
 
-                    <div className="flex gap-2 flex-shrink-0">
+                    <div className="flex flex-col sm:flex-row gap-2 flex-shrink-0">
                       {editingCategoryId === cat._id ? (
                         <>
                           <button
@@ -640,14 +658,14 @@ export default function Dashboard() {
                         <>
                           <button
                             onClick={() => startEditCategory(cat)}
-                            className="rounded-full border border-amber-500/30 px-4 py-2 text-sm text-amber-400 hover:bg-amber-500 hover:text-black transition"
+                            className="rounded-full border border-amber-500/30 px-4 py-2 text-sm text-amber-400 hover:bg-amber-500 hover:text-black transition text-center"
                           >
-                            عدّل
+                            تعديل
                           </button>
                           <button
                             onClick={() => handleDeleteCategory(cat._id)}
                             disabled={deletingCategoryId === cat._id}
-                            className="rounded-full border border-red-500/30 px-4 py-2 text-sm text-red-400 hover:bg-red-500 hover:text-white transition disabled:opacity-50"
+                            className="rounded-full border border-red-500/30 px-4 py-2 text-sm text-red-400 hover:bg-red-500 hover:text-white transition disabled:opacity-50 text-center"
                           >
                             {deletingCategoryId === cat._id ? "..." : "حذف"}
                           </button>
@@ -659,7 +677,7 @@ export default function Dashboard() {
                   {editingCategoryId === cat._id && (
                     <div className="mt-3">
                       <label className="block text-gray-400 text-sm mb-1">
-                        تبديل صورة التصنيف (اختياري)
+                        تغيير صورة التصنيف (اختياري)
                       </label>
                       <input
                         type="file"
@@ -676,7 +694,7 @@ export default function Dashboard() {
             </div>
 
             {categories.length === 0 && (
-              <p className="text-gray-400 text-center">ماكاينش تصنيفات بعد</p>
+              <p className="text-gray-400 text-center">لا توجد تصنيفات حالياً</p>
             )}
           </>
         )}
