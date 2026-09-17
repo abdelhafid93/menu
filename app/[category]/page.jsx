@@ -3,9 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { LuArrowLeft } from "react-icons/lu";
 import { notFound } from "next/navigation";
-import HokAddCart from "./_components/HokAddCart";
-import { FaShoppingBag } from "react-icons/fa";
-import CartLength from "./_components/CartLength";
+
 
 
 // جلب البيانات من Sanity
@@ -55,7 +53,7 @@ async function PageHome({ params }) {
         </Link>
        {/* ## icon shop */}
 <div className="relative inline-flex  items-center justify-center">
-    {/* <FaShoppingBag className="text-red-600 text-2xl md:text-3xl" /> */}
+    {/* <FaSho ppingBag className="text-red-600 text-2xl md:text-3xl" /> */}
     {/* <CartLength  />  */}
 </div>
       </div>
