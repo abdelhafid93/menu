@@ -30,6 +30,15 @@ export default function Dashboard() {
   const [addingCategory, setAddingCategory] = useState(false)
   const [deletingCategoryId, setDeletingCategoryId] = useState(null)
 
+  // --- تعديل تصنيف ---
+  const [editingCategoryId, setEditingCategoryId] = useState(null)
+  const [editCategoryValues, setEditCategoryValues] = useState({ name: "", order: "" })
+  const [editCategoryImageFile, setEditCategoryImageFile] = useState(null)
+  const [savingCategory, setSavingCategory] = useState(false)
+
+  // --- بحث عن الأطباق ---
+  const [searchTerm, setSearchTerm] = useState("")
+
   useEffect(() => {
     loadDishes()
   }, [])
@@ -223,6 +232,50 @@ export default function Dashboard() {
     }
   }
 
+  function startEditCategory(cat) {
+    setEditingCategoryId(cat._id)
+    setEditCategoryValues({ name: cat.name, order: cat.order ?? "" })
+    setEditCategoryImageFile(null)
+    setError("")
+  }
+
+  function cancelEditCategory() {
+    setEditingCategoryId(null)
+    setEditCategoryImageFile(null)
+    setError("")
+  }
+
+  async function saveEditCategory(id) {
+    setSavingCategory(true)
+    setError("")
+    try {
+      let imageAssetId = null
+      if (editCategoryImageFile) {
+        imageAssetId = await uploadImage(editCategoryImageFile)
+      }
+
+      const res = await fetch("/api/categories", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id,
+          name: editCategoryValues.name,
+          order: editCategoryValues.order,
+          imageAssetId,
+        }),
+      })
+
+      if (!res.ok) throw new Error()
+
+      await loadDishes()
+      setEditingCategoryId(null)
+    } catch (err) {
+      setError("ماقدرش يحفظ التصنيف، حاول مرة أخرى")
+    } finally {
+      setSavingCategory(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0F0F0F] text-white">
@@ -265,10 +318,17 @@ export default function Dashboard() {
 
         {tab === "dishes" && (
           <>
-            <div className="flex justify-end mb-4">
+            <div className="flex flex-col sm:flex-row gap-3 mb-4">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="ابحث عن طبق بالاسم..."
+                className="flex-1 rounded-full bg-[#171717] border border-gray-700 px-5 py-2.5 text-white text-sm focus:outline-none focus:border-amber-500"
+              />
               <button
                 onClick={() => setShowAddForm((v) => !v)}
-                className="rounded-full bg-amber-500 px-5 py-2.5 text-sm font-semibold text-black hover:bg-amber-600 transition"
+                className="rounded-full bg-amber-500 px-5 py-2.5 text-sm font-semibold text-black hover:bg-amber-600 transition whitespace-nowrap"
               >
                 {showAddForm ? "إلغاء" : "+ إضافة طبق"}
               </button>
@@ -333,7 +393,11 @@ export default function Dashboard() {
             )}
 
             <div className="space-y-4">
-              {dishes.map((dish) => (
+              {dishes
+                .filter((dish) =>
+                  dish.name?.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+                .map((dish) => (
                 <div
                   key={dish._id}
                   className="rounded-2xl border border-amber-500/20 bg-[#171717] p-4"
@@ -505,29 +569,108 @@ export default function Dashboard() {
               {categories.map((cat) => (
                 <div
                   key={cat._id}
-                  className="flex items-center gap-4 rounded-2xl border border-amber-500/20 bg-[#171717] p-4"
+                  className="rounded-2xl border border-amber-500/20 bg-[#171717] p-4"
                 >
-                  <div className="relative w-14 h-14 flex-shrink-0 rounded-xl overflow-hidden bg-gray-800">
-                    {cat.imageUrl && (
-                      <Image
-                        src={cat.imageUrl}
-                        alt={cat.name}
-                        fill
-                        className="object-cover"
-                      />
+                  <div className="flex items-center gap-4">
+                    <div className="relative w-14 h-14 flex-shrink-0 rounded-xl overflow-hidden bg-gray-800">
+                      {cat.imageUrl && (
+                        <Image
+                          src={cat.imageUrl}
+                          alt={cat.name}
+                          fill
+                          className="object-cover"
+                        />
+                      )}
+                    </div>
+
+                    {editingCategoryId === cat._id ? (
+                      <div className="flex-1 flex flex-col sm:flex-row gap-2">
+                        <input
+                          type="text"
+                          value={editCategoryValues.name}
+                          onChange={(e) =>
+                            setEditCategoryValues((v) => ({
+                              ...v,
+                              name: e.target.value,
+                            }))
+                          }
+                          className="flex-1 rounded-lg bg-[#0F0F0F] border border-gray-700 px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                          placeholder="اسم التصنيف"
+                        />
+                        <input
+                          type="number"
+                          value={editCategoryValues.order}
+                          onChange={(e) =>
+                            setEditCategoryValues((v) => ({
+                              ...v,
+                              order: e.target.value,
+                            }))
+                          }
+                          className="w-full sm:w-24 rounded-lg bg-[#0F0F0F] border border-gray-700 px-3 py-2 text-white focus:outline-none focus:border-amber-500"
+                          placeholder="ترتيب"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex-1">
+                        <p className="text-white font-semibold">{cat.name}</p>
+                        <p className="text-gray-400 text-sm">
+                          ترتيب: {cat.order ?? "-"}
+                        </p>
+                      </div>
                     )}
+
+                    <div className="flex gap-2 flex-shrink-0">
+                      {editingCategoryId === cat._id ? (
+                        <>
+                          <button
+                            onClick={() => saveEditCategory(cat._id)}
+                            disabled={savingCategory}
+                            className="rounded-full bg-amber-500 px-4 py-2 text-sm font-semibold text-black hover:bg-amber-600 disabled:opacity-50"
+                          >
+                            {savingCategory ? "..." : "حفظ"}
+                          </button>
+                          <button
+                            onClick={cancelEditCategory}
+                            className="rounded-full border border-gray-600 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800"
+                          >
+                            إلغاء
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => startEditCategory(cat)}
+                            className="rounded-full border border-amber-500/30 px-4 py-2 text-sm text-amber-400 hover:bg-amber-500 hover:text-black transition"
+                          >
+                            عدّل
+                          </button>
+                          <button
+                            onClick={() => handleDeleteCategory(cat._id)}
+                            disabled={deletingCategoryId === cat._id}
+                            className="rounded-full border border-red-500/30 px-4 py-2 text-sm text-red-400 hover:bg-red-500 hover:text-white transition disabled:opacity-50"
+                          >
+                            {deletingCategoryId === cat._id ? "..." : "حذف"}
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <p className="text-white font-semibold">{cat.name}</p>
-                    <p className="text-gray-400 text-sm">ترتيب: {cat.order ?? "-"}</p>
-                  </div>
-                  <button
-                    onClick={() => handleDeleteCategory(cat._id)}
-                    disabled={deletingCategoryId === cat._id}
-                    className="rounded-full border border-red-500/30 px-4 py-2 text-sm text-red-400 hover:bg-red-500 hover:text-white transition disabled:opacity-50"
-                  >
-                    {deletingCategoryId === cat._id ? "..." : "حذف"}
-                  </button>
+
+                  {editingCategoryId === cat._id && (
+                    <div className="mt-3">
+                      <label className="block text-gray-400 text-sm mb-1">
+                        تبديل صورة التصنيف (اختياري)
+                      </label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) =>
+                          setEditCategoryImageFile(e.target.files[0])
+                        }
+                        className="w-full text-gray-300 text-sm file:mr-3 file:rounded-full file:border-0 file:bg-amber-500 file:px-4 file:py-2 file:text-black file:font-semibold"
+                      />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

@@ -2,6 +2,37 @@ import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import { writeClient } from "@/sanity/writeClient"
 
+export async function PATCH(request) {
+  const cookieStore = await cookies()
+  const session = cookieStore.get("admin_session")
+
+  if (!session || session.value !== process.env.ADMIN_PASSWORD) {
+    return NextResponse.json({ error: "غير مصرح" }, { status: 401 })
+  }
+
+  try {
+    const { id, name, order, imageAssetId } = await request.json()
+
+    if (!id) {
+      return NextResponse.json({ error: "معرف التصنيف ناقص" }, { status: 400 })
+    }
+
+    const updates = { name, order: Number(order) || 0 }
+    if (imageAssetId) {
+      updates.image = {
+        _type: "image",
+        asset: { _type: "reference", _ref: imageAssetId },
+      }
+    }
+
+    const updatedDoc = await writeClient.patch(id).set(updates).commit()
+
+    return NextResponse.json({ success: true, doc: updatedDoc })
+  } catch (err) {
+    return NextResponse.json({ error: "خطأ فالتحديث" }, { status: 500 })
+  }
+}
+
 export async function POST(request) {
   const cookieStore = await cookies()
   const session = cookieStore.get("admin_session")
